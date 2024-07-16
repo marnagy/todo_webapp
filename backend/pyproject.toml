@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "Todo Web"
+version = "0.1"
+description = "Simple Todo Web"
+authors = ["Marek Nagy"]
+license = ""
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+fastapi = "^0.111.0"
+aiosqlite = "^0.20.0"
+sqlalchemy = "^2.0.31"
+
+[tool.poetry.dev-dependencies]
+pycodestyle = "^2.8.0"
+autopep8 = "^1.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

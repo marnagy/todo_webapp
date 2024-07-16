@@ -1,0 +1,12 @@
+services:
+  todo-backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - 9100:8000
+      - 9101:8001  # dev
+    volumes:
+      - ./backend:/backend
+    command: /bin/sh -c "while sleep 1000; do :; done"
