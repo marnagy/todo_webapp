@@ -1,10 +1,12 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 
 import crud
 import models
 import schemas
 from database import SessionLocal, engine
+
+import os
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -24,7 +26,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user is not None:
         raise HTTPException(status_code=400, detail="Username already registered")
-    return crud.create_user(db=db, user=user)
+    return crud.create_user(db=db, user_create=user)
 
 
 # @app.get("/users/", response_model=list[schemas.User])
@@ -39,6 +41,22 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+@app.post('/token', response_model=schemas.Token)
+def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    db_user = crud.authenticate_user(db, user_create)
+    if db_user is None:
+        return credentials_exception
+    # create JWT token
+    access_token = crud.create_access_token(
+        data={"sub": db_user.username}
+    )
+    return schemas.Token(access_token=access_token, token_type="bearer")
 
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(

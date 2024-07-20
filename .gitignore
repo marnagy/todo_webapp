@@ -1,1 +1,2 @@
 backend/todo_app.sqlite
+.env

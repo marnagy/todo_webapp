@@ -9,4 +9,6 @@ services:
       - 9101:8001  # dev
     volumes:
       - ./backend:/backend
+    env_file:
+      - ./.env
     command: /bin/sh -c "while sleep 1000; do :; done"

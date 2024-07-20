@@ -10,7 +10,6 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    salt = Column(String, nullable=False)
 
 #     todos = relationship("Todo", back_populates="owner")
 

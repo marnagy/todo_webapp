@@ -10,6 +10,8 @@ python = "3.11.*"
 fastapi = "^0.111.0"
 aiosqlite = "^0.20.0"
 sqlalchemy = "^2.0.31"
+pyjwt = "^2.8.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [tool.poetry.dev-dependencies]
 pycodestyle = "^2.8.0"

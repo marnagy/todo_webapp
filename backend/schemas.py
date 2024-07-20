@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 #     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True
 
 
 # class TodoBase(BaseModel):
@@ -28,7 +28,7 @@ from pydantic import BaseModel
 #     items: list[TodoItem] = []
 
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True
 
 
 class UserBase(BaseModel):
@@ -40,9 +40,15 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     hashed_password: str
-    salt: str
 
     # todos: list[Todo] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str | None = None
