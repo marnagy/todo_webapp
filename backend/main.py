@@ -1,12 +1,17 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+# pip
+from fastapi import Depends, FastAPI, HTTPException, status, Header
 from sqlalchemy.orm import Session
 
+# custom modules
 import crud
 import models
 import schemas
+from bearer import JWTBearer
 from database import SessionLocal, engine
 
+# standard lib
 import os
+from typing import Annotated
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -58,11 +63,18 @@ def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
     )
     return schemas.Token(access_token=access_token, token_type="bearer")
 
+@app.get('/home', dependencies=[Depends(JWTBearer())])
+def home():
+    return {'Welcome to': 'home page'}
+
+
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(
 #     user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)
 # ):
 #     return crud.create_user_item(db=db, item=item, user_id=user_id)
+
+
 
 
 @app.get("/")
