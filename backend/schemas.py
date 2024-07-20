@@ -16,19 +16,19 @@ from pydantic import BaseModel
 #         from_attributes = True
 
 
-# class TodoBase(BaseModel):
-#     title: str
-#     owner_id: int
+class TodoBase(BaseModel):
+    title: str
+    owner_id: int
 
-# class TodoCreate(TodoBase):
-#     pass
+class TodoCreate(TodoBase):
+    pass
 
-# class Todo(TodoBase)
-#     id: int
-#     items: list[TodoItem] = []
+class Todo(TodoBase)
+    id: int
+    items: list[TodoItem] = []
 
-#     class Config:
-#         from_attributes = True
+    class Config:
+        from_attributes = True
 
 
 class UserBase(BaseModel):

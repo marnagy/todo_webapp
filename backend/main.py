@@ -25,6 +25,9 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
 @app.post("/users/add", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -40,12 +43,12 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 #     return users
 
 
-@app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+# @app.get("/users/{user_id}", response_model=schemas.User)
+# def read_user(user_id: int, db: Session = Depends(get_db)):
+#     db_user = crud.get_user(db, user_id=user_id)
+#     if db_user is None:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return db_user
 
 @app.post('/token', response_model=schemas.Token)
 def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -63,10 +66,18 @@ def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
     )
     return schemas.Token(access_token=access_token, token_type="bearer")
 
-@app.get('/home', dependencies=[Depends(JWTBearer())])
-def home():
+### authenticated endpoints ###
+
+# authentication test
+@app.get('/home') #, dependencies=[Depends(JWTBearer())])
+def home(token: JWTBearer = Depends(JWTBearer())):
     return {'Welcome to': 'home page'}
 
+@app.get('/todo') #, dependencies=[Depends(JWTBearer())])
+def get_all_todos(db: Session = Depends(get_db), token = Depends(JWTBearer())):
+    db_user = crud.get_current_user(db, token)
+    # TODO: continue here
+    todos = crud.get_todos(db, db_user)
 
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(
@@ -74,17 +85,3 @@ def home():
 # ):
 #     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
-
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-# @app.post("/todo/add")
-# async def add_todo(todo):
-    
-
-# @app.get("/todo/{todo_id}")
-# async def get_todo(todo_id: int):
-#     pass
