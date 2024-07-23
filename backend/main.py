@@ -61,8 +61,10 @@ def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
     if db_user is None:
         return credentials_exception
     # create JWT token
+    data_dict = {"sub": db_user.username}
+    print(f"Creating token on {data_dict}")
     access_token = crud.create_access_token(
-        data={"sub": db_user.username}
+        data=data_dict
     )
     return schemas.Token(access_token=access_token, token_type="bearer")
 
@@ -76,8 +78,18 @@ def home(token: JWTBearer = Depends(JWTBearer())):
 @app.get('/todo') #, dependencies=[Depends(JWTBearer())])
 def get_all_todos(db: Session = Depends(get_db), token = Depends(JWTBearer())):
     db_user = crud.get_current_user(db, token)
+    print(db_user)
     # TODO: continue here
     todos = crud.get_todos(db, db_user)
+    return {
+        {
+            "id": todo.id,
+            "items": [
+                # for item in todo.items
+            ]
+        }
+        for todo in todos
+    }
 
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(

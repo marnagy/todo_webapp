@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 import jwt
 from jwt.exceptions import InvalidTokenError
-from fastapi import Depends, status
+from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 import models
@@ -43,7 +43,12 @@ def get_user_by_username(db: Session, username: str):
 def get_users(db: Session, offset: int = 0, limit: int = 100):
     return db.query(models.User).offset(offset).limit(limit).all()
 
-def create_user(db: Session, user_create: schemas.UserCreate):
+def get_todos(db: Session, db_user: models.User) -> list[schemas.Todo]:
+    # db_user = get_current_user(db, token)
+    user = schemas.User.from_db(db_user)
+    return user.todos
+
+def create_user(db: Session, user_create: schemas.UserCreate) -> schemas.User:
     password_hashed = get_password_hash(user_create.password)
     db_user = models.User(
         username=user_create.username,
@@ -52,7 +57,7 @@ def create_user(db: Session, user_create: schemas.UserCreate):
     db.add(db_user)
     db.commit()
     db_user = get_user_by_username(db, username=user_create.username)
-    return db_user
+    return schemas.User.from_db(db_user)
 
 def authenticate_user(db: Session, user_create: schemas.UserCreate) -> Optional[schemas.User]:
     db_user = get_user_by_username(db, user_create.username)
@@ -69,21 +74,20 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]) -> Optional[models.User]:
+    # credentials_exception = HTTPException(
+    #     status_code=status.HTTP_401_UNAUTHORIZED,
+    #     detail="Could not validate credentials",
+    #     headers={"WWW-Authenticate": "Bearer"},
+    # )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(payload)
         username: str = payload.get("sub")
+        print(username)
         if username is None:
             return None
-        token_data = TokenData(username=username)
     except InvalidTokenError:
         return None
-    user = get_user_by_username(db, username=token_data.username)
-    if user is None:
-        return None
-    return user
+    db_user = get_user_by_username(db, username=username)
+    return db_user

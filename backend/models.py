@@ -13,6 +13,13 @@ class User(Base):
 
     todos = relationship("Todo", back_populates="owner")
 
+    def __str__(self) -> str:
+        return str({
+            'id': self.id,
+            'username': self.username,
+            'hashed_password': self.hashed_password
+        })
+
 
 class Todo(Base):
     __tablename__ = "todos"
