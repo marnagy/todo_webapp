@@ -11,7 +11,7 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
 
-    todos = relationship("Todo", back_populates="owner")
+    todos = relationship("Todo", back_populates="owner", cascade="all, delete")
 
     def __str__(self) -> str:
         return str({
@@ -29,7 +29,7 @@ class Todo(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="todos")
-    items = relationship("TodoItem", back_populates="todo")
+    items = relationship("TodoItem", back_populates="todo", cascade="all, delete")
 
 class TodoItem(Base):
     __tablename__ = "todo_items"

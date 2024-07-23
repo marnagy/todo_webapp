@@ -77,19 +77,24 @@ def home(token: JWTBearer = Depends(JWTBearer())):
 
 @app.get('/todo') #, dependencies=[Depends(JWTBearer())])
 def get_all_todos(db: Session = Depends(get_db), token = Depends(JWTBearer())):
-    db_user = crud.get_current_user(db, token)
-    print(db_user)
-    # TODO: continue here
-    todos = crud.get_todos(db, db_user)
-    return {
-        {
-            "id": todo.id,
-            "items": [
-                # for item in todo.items
-            ]
-        }
-        for todo in todos
-    }
+    # user = crud.get_current_user(db, token)
+    todos = crud.get_todos(db, token)
+    return todos
+    # return {
+    #     {
+    #         "id": todo.id,
+    #         "title": todo.title,
+    #         "items": [
+    #             # for item in todo.items
+    #         ]
+    #     }
+    #     for todo in todos
+    # }
+
+@app.post('/todo/add')
+def add_todo(todo_create: schemas.TodoCreate, db: Session = Depends(get_db), token = Depends(JWTBearer())):
+    todo = crud.add_todo(db, token, todo_create)
+    return todo
 
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(

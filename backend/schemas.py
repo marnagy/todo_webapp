@@ -20,13 +20,13 @@ import models
 
 class TodoBase(BaseModel):
     title: str
-    owner_id: int
 
 class TodoCreate(TodoBase):
     pass
 
 class Todo(TodoBase):
     id: int
+    owner_id: int
     title: str
     owner_id: int
     # items: list[TodoItem] = []

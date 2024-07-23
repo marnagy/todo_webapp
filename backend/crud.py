@@ -43,10 +43,22 @@ def get_user_by_username(db: Session, username: str):
 def get_users(db: Session, offset: int = 0, limit: int = 100):
     return db.query(models.User).offset(offset).limit(limit).all()
 
-def get_todos(db: Session, db_user: models.User) -> list[schemas.Todo]:
-    # db_user = get_current_user(db, token)
+def get_todos(db: Session,
+              token: Annotated[str, Depends(oauth2_scheme)]) -> list[schemas.Todo]:
+    db_user = get_current_user(db, token)
     user = schemas.User.from_db(db_user)
     return user.todos
+
+def add_todo(db: Session,
+             token: Annotated[str, Depends(oauth2_scheme)],
+             todo_create: schemas.TodoCreate) -> schemas.Todo:
+    db_user = get_current_user(db, token)
+    db_todo = models.Todo(
+        title=todo_create.title
+    )
+    db_user.todos.append(db_todo)
+    db.commit()
+    return schemas.Todo.from_db(db_todo)
 
 def create_user(db: Session, user_create: schemas.UserCreate) -> schemas.User:
     password_hashed = get_password_hash(user_create.password)
