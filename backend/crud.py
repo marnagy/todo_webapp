@@ -9,13 +9,20 @@ import models
 import schemas
 
 import random
-from typing import Optional, Annotated
+from typing import Optional, Annotated, Iterable, TypeVar
 from datetime import datetime, timedelta, timezone
 import os
 
 SECRET_KEY = os.getenv('BACKEND_SECRET_KEY')
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = int(os.getenv('TOKEN_EXPIRE_MINUTES'))
+
+T = TypeVar('T')
+
+def first(iter: Iterable[T]) -> T:
+    should_continue = True
+    for item in iter:
+        return item
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -59,6 +66,40 @@ def add_todo(db: Session,
     db_user.todos.append(db_todo)
     db.commit()
     return schemas.Todo.from_db(db_todo)
+
+def add_todo_item(db: Session,
+                  token: Annotated[str, Depends(oauth2_scheme)],
+                  todo_id: int,
+                  todo_item_create: schemas.TodoItemCreate) -> schemas.TodoItem:
+    db_user = get_current_user(db, token)
+    db_todos = list(filter(lambda todo: todo.id == todo_id, db_user.todos))
+    if len(db_todos) != 1:
+        return None
+    db_todo = db_todos[0]
+    db_todo_item = models.TodoItem(
+        done=False,
+        description=todo_item_create.description
+    )
+    db_todo.items.append(db_todo_item)
+    db.commit()
+    return schemas.TodoItem.from_db(db_todo_item)
+
+def change_state(db: Session,
+                 token: Annotated[str, Depends(oauth2_scheme)],
+                 todo_id: int,
+                 todo_item_id: int) -> schemas.TodoItem:
+    db_user = get_current_user(db, token)
+    db_todos = list(filter(lambda todo: todo.id == todo_id, db_user.todos))
+    if len(db_todos) != 1:
+        return None
+    db_todo = db_todos[0]
+    db_todo_items = list(filter(lambda todo: todo.id == todo_id, db_todo.items))
+    if len(db_todo_items) != 1:
+        return None
+    db_todo_item = db_todo_items[0]
+    db_todo_item.done = not db_todo_item.done
+    db.commit()
+    return schemas.TodoItem.from_db(db_todo_item)
 
 def create_user(db: Session, user_create: schemas.UserCreate) -> schemas.User:
     password_hashed = get_password_hash(user_create.password)

@@ -2,20 +2,29 @@ from pydantic import BaseModel
 
 import models
 
-# class TodoItemBase(BaseModel):
-#     description: str = ""
+class TodoItemBase(BaseModel):
+    description: str = ""
 
-# class TodoItemBaseCreate(Item):
-#     pass
+class TodoItemCreate(TodoItemBase):
+    pass
 
-# class TodoItem(TodoItemBase):
-#     id: int
-#     todo_id: int
-#     done: bool = False
+class TodoItem(TodoItemBase):
+    id: int
+    todo_id: int
+    done: bool
 
-#     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
-#     class Config:
-#         from_attributes = True
+    @staticmethod
+    def from_db(db_todo_item: models.TodoItem) -> 'TodoItem':
+        return TodoItem(
+            description=db_todo_item.description,
+            id=db_todo_item.id,
+            todo_id=db_todo_item.todo_id,
+            done=db_todo_item.done,
+        )
+
+    # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
+    class Config:
+        from_attributes = True
 
 
 class TodoBase(BaseModel):
@@ -29,7 +38,7 @@ class Todo(TodoBase):
     owner_id: int
     title: str
     owner_id: int
-    # items: list[TodoItem] = []
+    items: list[TodoItem] = []
 
     @staticmethod
     def from_db(db_todo: models.Todo) -> 'Todo':
@@ -37,9 +46,10 @@ class Todo(TodoBase):
             id=db_todo.id,
             title=db_todo.title,
             owner_id=db_todo.owner_id,
-            # items=[
-            #     for item in db_todo.items
-            # ]
+            items=[
+                TodoItem.from_db(item)
+                for item in db_todo.items
+            ]
         )
 
     class Config:
