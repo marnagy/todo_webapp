@@ -35,7 +35,7 @@ RUN poetry config virtualenvs.create false && poetry install --without dev --no-
 EXPOSE 8000
 # dev
 EXPOSE 8001
-CMD [ "fastapi", "dev", "main.py" ]
+CMD [ "sh", "run.sh" ]
 
 # FROM base AS prod
 # WORKDIR /backend
