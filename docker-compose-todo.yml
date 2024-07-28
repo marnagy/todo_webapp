@@ -19,8 +19,8 @@ services:
       dockerfile: Dockerfile
       target: dev
     ports:
-      - 9300:3000
-      # - 9301:3001
+      - 9300:8000
+      # - 9301:8001
     volumes:
       - ./frontend:/frontend
     command: /bin/sh -c "while sleep 1000; do :; done"
