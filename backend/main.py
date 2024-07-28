@@ -96,6 +96,15 @@ def add_todo(todo_create: schemas.TodoCreate, db: Session = Depends(get_db), tok
     todo = crud.add_todo(db, token, todo_create)
     return todo
 
+@app.delete('/todo/{todo_id}')
+def remove_item(todo_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
+    try:
+        res = crud.remove_todo(db, token, todo_id)
+        return { 'success': res }
+    except Exception as e:
+        print(e)
+        return { 'success': False }
+
 @app.post('/todo/{todo_id}/item/add')
 def add_todo(todo_id: int, todo_item_create: schemas.TodoItemCreate, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     todo_item = crud.add_todo_item(db, token, todo_id, todo_item_create)
@@ -105,6 +114,15 @@ def add_todo(todo_id: int, todo_item_create: schemas.TodoItemCreate, db: Session
 def change_item_state(todo_id: int, todo_item_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     todo_item = crud.change_state(db, token, todo_id, todo_item_id)
     return todo_item
+
+@app.delete('/todo/{todo_id}/item/{todo_item_id}')
+def remove_item(todo_id: int, todo_item_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
+    try:
+        res = crud.remove_item(db, token, todo_id, todo_item_id)
+        return { 'success': res }
+    except Exception as e:
+        print(e)
+        return { 'success': False }
 
 # @app.post("/users/{user_id}/todos/", response_model=schemas.Item)
 # def create_item_for_user(

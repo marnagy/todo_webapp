@@ -67,6 +67,18 @@ def add_todo(db: Session,
     db.commit()
     return schemas.Todo.from_db(db_todo)
 
+def remove_todo(db: Session,
+                token: Annotated[str, Depends(oauth2_scheme)],
+                todo_id: int) -> bool:
+    db_user = get_current_user(db, token)
+    db_todos = list(filter(lambda todo: todo.id == todo_id, db_user.todos))
+    if len(db_todos) != 1:
+        return True
+    db_todo = db_todos[0]
+    db_user.todos.remove(db_todo)
+    db.commit()
+    return True
+
 def add_todo_item(db: Session,
                   token: Annotated[str, Depends(oauth2_scheme)],
                   todo_id: int,
@@ -83,6 +95,23 @@ def add_todo_item(db: Session,
     db_todo.items.append(db_todo_item)
     db.commit()
     return schemas.TodoItem.from_db(db_todo_item)
+
+def remove_item(db: Session,
+                token: Annotated[str, Depends(oauth2_scheme)],
+                todo_id: int,
+                todo_item_id: int) -> bool:
+    db_user = get_current_user(db, token)
+    db_todos = list(filter(lambda todo: todo.id == todo_id, db_user.todos))
+    if len(db_todos) != 1:
+        return True
+    db_todo = db_todos[0]
+    db_items = list(filter(lambda item: item.id == todo_item_id, db_todo.items))
+    if len(db_items) != 1:
+        return True
+    db_todo_item = db_items[0]
+    db_todo.items.remove(db_todo_item)
+    db.commit()
+    return True
 
 def change_state(db: Session,
                  token: Annotated[str, Depends(oauth2_scheme)],
