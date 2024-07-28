@@ -12,3 +12,15 @@ services:
     env_file:
       - ./.env
     command: /bin/sh -c "while sleep 1000; do :; done"
+
+  todo-frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - 9300:3000
+      # - 9301:3001
+    volumes:
+      - ./frontend:/frontend
+    command: /bin/sh -c "while sleep 1000; do :; done"
