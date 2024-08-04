@@ -24,3 +24,16 @@ services:
     volumes:
       - ./frontend:/frontend
     command: /bin/sh -c "while sleep 1000; do :; done"
+  
+  simple-todo-frontend:
+    build:
+      context: simple_frontend
+      dockerfile: Dockerfile
+      target: dev
+    # image: httpd:2.4
+    ports:
+      - 7080:80
+      - 7443:443
+    volumes:
+      - ./simple_frontend:/frontend
+    # command: /bin/sh -c "while sleep 1000; do :; done"
