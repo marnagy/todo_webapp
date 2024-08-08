@@ -1,5 +1,17 @@
 # pip
 from fastapi import Depends, FastAPI, HTTPException, status, Header
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import (
+    # FileResponse,
+    # HTMLResponse,
+    # JSONResponse,
+    # ORJSONResponse,
+    # PlainTextResponse,
+    RedirectResponse,
+    # Response,
+    # StreamingResponse,
+    # UJSONResponse,
+)
 from sqlalchemy.orm import Session
 
 # custom modules
@@ -17,6 +29,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -25,9 +39,13 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
+@app.get("/test")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/")
+def log_in_page():
+    return RedirectResponse("/static/html/login.html")
 
 @app.post("/users/add", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):

@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/css/base.css">
+    </head>
+    <body>
+        <div id="app" class="flex-container flex-container-vert-center flex-container-horiz-center">
+            <form class="flex-container flex-container-vert-center flex-container-horiz-center" action="/token" method="post">
+                <label for="username">Username</label>
+                <input type="text" name="username" pattern="[a-zA-Z0-9]{3,}" placeholder="Your username">
+                <label for="password">Password</label>
+                <input type="password" name="password" pattern=".{3,}" placeholder="Your password">
+                <div id="button-container" class="flex-container flex-container-vert-center">
+                    <button id="log-in-button">Log in</button>
+                    <button id="new-account-button">Create new account</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
