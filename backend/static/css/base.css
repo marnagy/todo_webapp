@@ -16,35 +16,38 @@ body {
 
 .flex-container-vert-center {
     align-items: center;
+}
+
+.flex-container-horiz-center {
     justify-content: center;
 }
 
-form > label {
+#form-container > label {
     color: white;
 }
 
 
-form {
-    width: 90%;
-    height: 30%;
+#form-container {
+    width: max(90%, 500px);
+    height: max(30%, 500px);
     background-color: rgb(120, 201, 206);
     flex-direction: column;
     border-radius: 15px;
 }
 
-form > * {
+#form-container > * {
     padding: 10px;
     margin: 0;
     font-size: xx-large;
 }
 
-form > input {
+#form-container > input {
     text-align: center;
     padding: 2px;
     width: 90%;
 }
 
-form > #button-container {
+#form-container > #button-container {
     width: 80%;
     /* background-color: blue; */
     justify-content: space-between;
@@ -52,7 +55,7 @@ form > #button-container {
     flex-direction: column;
 }
 
-form > #button-container > button {
+#form-container > #button-container button {
     font-size: x-large;
     /* font-weight: bold; */
     margin: 5px;

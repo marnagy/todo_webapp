@@ -1,6 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="/static/css/base.css">
+        <script src="/static/js/create_new_user.js"></script>
     </head>
     <body>
         <div id="app" class="flex-container flex-container-vert-center flex-container-horiz-center">
@@ -9,13 +10,10 @@
                 <input id="username-input" type="text" name="username" pattern="[a-zA-Z0-9]{3,}" placeholder="Your username">
                 <label for="password">Password</label>
                 <input id="password-input" type="password" name="password" pattern=".{3,}" placeholder="Your password">
+                <label for="confirm-password">Confirm Password</label>
+                <input id="confirm-password-input" type="password" name="confirm-password" pattern=".{3,}" placeholder="Your confirmed password">
                 <div id="button-container" class="flex-container flex-container-vert-center">
-                    <button id="log-in-button">Log in</button>
-                    <a href="/static/html/create_new_user.html">
-                        <button id="new-account-button" >
-                            Create new account
-                        </button>
-                    </a>
+                    <button id="log-in-button" onclick="create_new_user()">Create new user</button>
                 </div>
             </form>
         </div>
