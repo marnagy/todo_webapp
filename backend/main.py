@@ -1,5 +1,5 @@
 # pip
-from fastapi import Depends, FastAPI, HTTPException, status, Header
+from fastapi import Depends, FastAPI, HTTPException, status, Header, APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import (
     # FileResponse,
@@ -29,6 +29,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+api_router = APIRouter(prefix='/api')
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Dependency
@@ -47,7 +49,7 @@ async def root():
 def log_in_page():
     return RedirectResponse("/static/html/login.html")
 
-@app.post("/users/add", response_model=schemas.User)
+@api_router.post("/users/add", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user is not None:
@@ -68,7 +70,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 #         raise HTTPException(status_code=404, detail="User not found")
 #     return db_user
 
-@app.post('/token', response_model=schemas.Token)
+@api_router.post('/token', response_model=schemas.Token)
 def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,7 +95,7 @@ def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
 def home(token: JWTBearer = Depends(JWTBearer())):
     return {'Welcome to': 'home page'}
 
-@app.get('/todo') #, dependencies=[Depends(JWTBearer())])
+@api_router.get('/todo') #, dependencies=[Depends(JWTBearer())])
 def get_all_todos(db: Session = Depends(get_db), token = Depends(JWTBearer())):
     # user = crud.get_current_user(db, token)
     todos = crud.get_todos(db, token)
@@ -109,12 +111,12 @@ def get_all_todos(db: Session = Depends(get_db), token = Depends(JWTBearer())):
     #     for todo in todos
     # }
 
-@app.post('/todo/add')
+@api_router.post('/todo/add')
 def add_todo(todo_create: schemas.TodoCreate, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     todo = crud.add_todo(db, token, todo_create)
     return todo
 
-@app.delete('/todo/{todo_id}')
+@api_router.delete('/todo/{todo_id}')
 def remove_item(todo_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     try:
         res = crud.remove_todo(db, token, todo_id)
@@ -123,17 +125,17 @@ def remove_item(todo_id: int, db: Session = Depends(get_db), token = Depends(JWT
         print(e)
         return { 'success': False }
 
-@app.post('/todo/{todo_id}/item/add')
+@api_router.post('/todo/{todo_id}/item/add')
 def add_todo(todo_id: int, todo_item_create: schemas.TodoItemCreate, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     todo_item = crud.add_todo_item(db, token, todo_id, todo_item_create)
     return todo_item
 
-@app.get('/todo/{todo_id}/item/{todo_item_id}/change_state')
+@api_router.get('/todo/{todo_id}/item/{todo_item_id}/change_state')
 def change_item_state(todo_id: int, todo_item_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     todo_item = crud.change_state(db, token, todo_id, todo_item_id)
     return todo_item
 
-@app.delete('/todo/{todo_id}/item/{todo_item_id}')
+@api_router.delete('/todo/{todo_id}/item/{todo_item_id}')
 def remove_item(todo_id: int, todo_item_id: int, db: Session = Depends(get_db), token = Depends(JWTBearer())):
     try:
         res = crud.remove_item(db, token, todo_id, todo_item_id)
@@ -148,3 +150,4 @@ def remove_item(todo_id: int, todo_item_id: int, db: Session = Depends(get_db), 
 # ):
 #     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
+app.include_router(api_router)
