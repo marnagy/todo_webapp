@@ -1,6 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="/static/css/base.css">
+        <script src="/static/js/login.js"></script>
     </head>
     <body>
         <div id="app" class="flex-container flex-container-vert-center flex-container-horiz-center">
@@ -10,7 +11,7 @@
                 <label for="password">Password</label>
                 <input id="password-input" type="password" name="password" pattern=".{3,}" placeholder="Your password">
                 <div id="button-container" class="flex-container flex-container-vert-center">
-                    <button id="log-in-button">Log in</button>
+                    <button id="log-in-button" onclick="login()">Log in</button>
                     <a href="/static/html/create_new_user.html">
                         <button id="new-account-button" >
                             Create new account
