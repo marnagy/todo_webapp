@@ -70,7 +70,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 #         raise HTTPException(status_code=404, detail="User not found")
 #     return db_user
 
-@api_router.post('/token', response_model=schemas.Token)
+@app.post('/token', response_model=schemas.Token)
 def get_token(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

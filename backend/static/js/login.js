@@ -17,7 +17,7 @@ async function login() {
     console.log(`Password is ${password}`);
 
     const base_url = window.location.origin;
-    const path = "/token";
+    const path = "/api/token";
     const url = `${base_url}${path}`;
     console.log(url);
 

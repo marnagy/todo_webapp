@@ -15,7 +15,7 @@ async function create_new_user() {
     
     console.log("Check passed!");
     const base_url = window.location.origin;
-    const path = "/users/add";
+    const path = "/api/users/add";
     const url = `${base_url}${path}`;
     console.log(url);
     
